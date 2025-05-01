@@ -29,7 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     name_father = models.CharField(max_length=50)
     name_mother = models.CharField(max_length=50)
     session = models.CharField(max_length=20)
-    blood_group = models.CharField(max_length=4)
+    blood_group = models.CharField(max_length=10)
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
