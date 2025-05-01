@@ -11,7 +11,7 @@ class CustomUserSerializer(serializers.Serializer):
     name_father = serializers.CharField(max_length=50)
     name_mother = serializers.CharField(max_length=50)
     session = serializers.CharField(max_length=20)
-    blood_group = serializers.CharField(max_length=4)
+    blood_group = serializers.CharField(max_length=10)
 
     def create(self, validated_data):
         user = models.CustomUser(
