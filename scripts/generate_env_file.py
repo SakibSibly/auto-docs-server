@@ -1,0 +1,17 @@
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+FILE_PATH = f"{BASE_DIR}/.env"
+
+with open(file=FILE_PATH, mode="w",) as f:
+    f.write(
+
+"""SECRET_KEY=YOUR_SECRET_KEY
+DJANGO_ENV=LOCAL_OR_PRODUCTION_IN_SMALL_LETTER
+DB_NAME=YOUR_DB_NAME
+DB_USER=YOUR_DB_USER
+DB_PASSWORD=YOUR_DB_PASSWORD
+DB_HOST=YOUR_DB_HOST
+DB_PORT=YOUR_DB_PORT"""
+
+)
