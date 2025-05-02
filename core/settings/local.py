@@ -51,7 +51,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Auto Docs",
+    "TITLE": "Auto Docs Project",
 }
 
 SIMPLE_JWT = {
