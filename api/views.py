@@ -26,9 +26,22 @@ class CustomUserCreate(APIView):
 
         if models.CustomUser.objects.filter(student_id=request.data.get('student_id')):
             return Response({'error': 'Student ID already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    
+        role_id = request.data.get('role')
+        role_instance = None
+
+        if role_id is not None:
+            try:
+                role_instance = models.Role.objects.get(id=role_id)
+            except models.Role.DoesNotExist:
+                return Response({'error': 'Invalid role ID'}, status=status.HTTP_400_BAD_REQUEST)
         
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            if role_instance:
+                user.role = role_instance
+                user.save()
+
             return Response({'user': serializer.data}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
