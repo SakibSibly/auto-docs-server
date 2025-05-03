@@ -7,7 +7,7 @@ class CustomUserSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=300)
     student_id = serializers.IntegerField()
     mobile_number = serializers.CharField(max_length=15, required=False, allow_blank=True)
-    date_of_birth = serializers.DateField(required=False, allow_blank=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
     role = serializers.IntegerField()
     full_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
     name_father = serializers.CharField(max_length=50, required=False, allow_blank=True)
@@ -20,7 +20,7 @@ class CustomUserSerializer(serializers.Serializer):
             email=validated_data.get('email', ""),
             student_id=validated_data.get('student_id', ""),
             mobile_number=validated_data.get('mobile_number', ""),
-            date_of_birth=validated_data.get('date_of_birth', ""),
+            date_of_birth=validated_data.get('date_of_birth', None),
             role_id=validated_data.get('role', ""),
             full_name=validated_data.get('full_name', ""),
             name_father=validated_data.get('name_father', ""),
