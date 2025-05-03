@@ -24,10 +24,9 @@ class CustomUserCreate(APIView):
         if models.CustomUser.objects.filter(email=request.data.get('email')):
             return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if models.CustomUser.objects.filter(username=request.data.get('username')):
-            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        if models.CustomUser.objects.filter(student_id=request.data.get('student_id')):
+            return Response({'error': 'Student ID already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
-
         if serializer.is_valid():
             serializer.save()
             return Response({'user': serializer.data}, status=status.HTTP_201_CREATED)

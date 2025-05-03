@@ -6,7 +6,6 @@ class CustomUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
     student_id = serializers.IntegerField()
-    username = serializers.CharField(max_length=20, required=False, allow_blank=True)
     full_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
     name_father = serializers.CharField(max_length=50, required=False, allow_blank=True)
     name_mother = serializers.CharField(max_length=50, required=False, allow_blank=True)
@@ -17,7 +16,6 @@ class CustomUserSerializer(serializers.Serializer):
         user = models.CustomUser(
             email=validated_data.get('email', ""),
             student_id=validated_data.get('student_id', ""),
-            username=validated_data.get('username', ""),
             full_name=validated_data.get('full_name', ""),
             name_father=validated_data.get('name_father', ""),
             name_mother=validated_data.get('name_mother', ""),
@@ -33,7 +31,6 @@ class CustomUserSerializer(serializers.Serializer):
         return {
             'email' : instance.email,
             'student_id' : instance.student_id,
-            'username' : instance.username,
             'full_name' : instance.full_name,
             'name_father' : instance.name_father,
             'name_mother' : instance.name_mother,
