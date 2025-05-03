@@ -15,9 +15,9 @@ class CustomUserCreate(APIView):
     ## The minimum required fields for the JSON Request body are:\n
     1. **email**: The email address of the user.\n
     2. **password**: The password for the user account.\n
-    3. **student_id**: The student ID of the user.\n
-    4. **role**: The role ID of the user.\n
-    5. **session**: The session ID of the user.\n
+    3. **student_id**: The student ID of the user. e.g. 200104\n
+    4. **role**: The role ID of the user. e.g. 1\n
+    5. **session**: The session of the user. e.g. 2020-21\n
     """
 
     @extend_schema(
