@@ -9,8 +9,15 @@ from . import models
 
 class CustomUserCreate(APIView):
     """
-    Register new users to the system using valid credentails\n
+    Register new users to the system using valid credentails.\n
     The account will be available after **activation** by the admins.
+
+    ## The minimum required fields for the JSON Request body are:\n
+    1. **email**: The email address of the user.\n
+    2. **password**: The password for the user account.\n
+    3. **student_id**: The student ID of the user.\n
+    4. **role**: The role ID of the user.\n
+    5. **session**: The session ID of the user.\n
     """
 
     @extend_schema(
@@ -75,6 +82,10 @@ class V1ApiGreet(APIView):
         return Response({"message": "Hello, World from API version 1!"}, status=status.HTTP_200_OK)
 
 class V1CurrentUser(APIView):
+    """
+    Get the current user's information.\n
+    The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+    """
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -82,8 +93,5 @@ class V1CurrentUser(APIView):
     )
 
     def get(self, request):
-        """
-        Get the current user's information.
-        """
         serializer = serializers.CustomUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
