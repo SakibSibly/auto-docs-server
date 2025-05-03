@@ -31,6 +31,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=300)
     student_id = models.IntegerField(unique=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, blank=True)
     full_name = models.CharField(max_length=50, null=True, blank=True)
     name_father = models.CharField(max_length=50, null=True, blank=True)
