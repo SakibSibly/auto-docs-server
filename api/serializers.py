@@ -6,25 +6,25 @@ class CustomUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
     student_id = serializers.IntegerField()
-    username = serializers.CharField(max_length=20)
-    full_name = serializers.CharField(max_length=50)
-    name_father = serializers.CharField(max_length=50)
-    name_mother = serializers.CharField(max_length=50)
+    username = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    full_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    name_father = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    name_mother = serializers.CharField(max_length=50, required=False, allow_blank=True)
     session = serializers.CharField(max_length=20)
-    blood_group = serializers.CharField(max_length=10)
+    blood_group = serializers.CharField(max_length=10, required=False, allow_blank=True)
 
     def create(self, validated_data):
         user = models.CustomUser(
-            email=validated_data['email'],
-            student_id=validated_data['student_id'],
-            username=validated_data['username'],
-            full_name=validated_data['full_name'],
-            name_father=validated_data['name_father'],
-            name_mother=validated_data['name_mother'],
-            session=validated_data['session'],
-            blood_group=validated_data['blood_group']
+            email=validated_data.get('email', ""),
+            student_id=validated_data.get('student_id', ""),
+            username=validated_data.get('username', ""),
+            full_name=validated_data.get('full_name', ""),
+            name_father=validated_data.get('name_father', ""),
+            name_mother=validated_data.get('name_mother', ""),
+            session=validated_data.get('session', ""),
+            blood_group=validated_data.get('blood_group', "")
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data.get('password', ""))
         user.save()
         return user
 
