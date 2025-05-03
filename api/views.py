@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.utils import extend_schema
 from . import serializers
@@ -72,3 +73,17 @@ class V1ApiGreet(APIView):
         Simple `Hello World` message from the **/api/v1/info/** endpoint.
         """
         return Response({"message": "Hello, World from API version 1!"}, status=status.HTTP_200_OK)
+
+class V1CurrentUser(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["user management"]
+    )
+
+    def get(self, request):
+        """
+        Get the current user's information.
+        """
+        serializer = serializers.CustomUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
