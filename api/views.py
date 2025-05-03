@@ -22,10 +22,10 @@ class CustomUserCreate(APIView):
         serializer = serializers.CustomUserSerializer(data=request.data)
         
         if models.CustomUser.objects.filter(email=request.data.get('email')):
-            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         if models.CustomUser.objects.filter(student_id=request.data.get('student_id')):
-            return Response({'error': 'Student ID already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Student ID already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
         role_id = request.data.get('role')
         role_instance = None
@@ -34,7 +34,7 @@ class CustomUserCreate(APIView):
             try:
                 role_instance = models.Role.objects.get(id=role_id)
             except models.Role.DoesNotExist:
-                return Response({'error': 'Invalid role ID'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'Invalid role ID'}, status=status.HTTP_400_BAD_REQUEST)
         
         if serializer.is_valid():
             user = serializer.save()
