@@ -52,6 +52,12 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Auto Docs Project",
+    "TAGS": [
+        {"name": "user management"},
+        {"name": "authenticated user management"},
+        {"name": "test"},
+        {"name": "schemas"},
+    ],
 }
 
 SIMPLE_JWT = {
