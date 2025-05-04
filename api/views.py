@@ -25,7 +25,6 @@ class CustomUserCreate(APIView):
         responses={201: serializers.CustomUserSerializer, 400: None},
         tags=["user management"]
     )
-
     def post(self, request):
         serializer = serializers.CustomUserSerializer(data=request.data)
         
@@ -74,7 +73,6 @@ class V1ApiGreet(APIView):
     @extend_schema(
         tags=["test"]
     )
-
     def get(self, request):
         """
         Simple `Hello World` message from the **/api/v1/info/** endpoint.
@@ -82,16 +80,48 @@ class V1ApiGreet(APIView):
         return Response({"message": "Hello, World from API version 1!"}, status=status.HTTP_200_OK)
 
 class V1CurrentUser(APIView):
-    """
-    Get the current user's information.\n
-    The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
-    """
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        tags=["user management"]
+        tags=["authenticated user management"]
     )
-
     def get(self, request):
+        """
+        Get the current user's information.\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
         serializer = serializers.CustomUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @extend_schema(
+        request=serializers.CustomUserSerializer,
+        responses={200: serializers.CustomUserSerializer, 400: None},
+        tags=["authenticated user management"]
+    )
+    def put(self, request):
+        """
+        Update the current user's information.\n
+        **Partial updates are allowed.**\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
+        
+        serializer = serializers.CustomUserSerializer(request.user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @extend_schema(
+        tags=["authenticated user management"]
+    )
+    def delete(self, request):
+        """
+        Delete the current user's account.\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
+        user = request.user
+        user.delete()
+        return Response({"detail": "User account deleted successfully."}, status=status.HTTP_404_NOT_FOUND)

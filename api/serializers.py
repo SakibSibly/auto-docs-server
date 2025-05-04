@@ -31,6 +31,24 @@ class CustomUserSerializer(serializers.Serializer):
         user.set_password(validated_data.get('password', ""))
         user.save()
         return user
+    
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.student_id = validated_data.get('student_id', instance.student_id)
+        instance.mobile_number = validated_data.get('mobile_number', instance.mobile_number)
+        instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
+        instance.role_id = validated_data.get('role', instance.role_id)
+        instance.full_name = validated_data.get('full_name', instance.full_name)
+        instance.name_father = validated_data.get('name_father', instance.name_father)
+        instance.name_mother = validated_data.get('name_mother', instance.name_mother)
+        instance.session = validated_data.get('session', instance.session)
+        instance.blood_group = validated_data.get('blood_group', instance.blood_group)
+
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+        
+        instance.save()
+        return instance
 
     
     def to_representation(self, instance):
