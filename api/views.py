@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from . import serializers
 from . import models
 
@@ -61,12 +61,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
+
 class CustomTokenRefreshView(TokenRefreshView):
     @extend_schema(
         tags=["user management"]
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
 
 class V1ApiGreet(APIView):
     
@@ -78,6 +80,7 @@ class V1ApiGreet(APIView):
         Simple `Hello World` message from the **/api/v1/info/** endpoint.
         """
         return Response({"message": "Hello, World from API version 1!"}, status=status.HTTP_200_OK)
+
 
 class V1CurrentUser(APIView):
     permission_classes = [IsAuthenticated]
@@ -125,3 +128,49 @@ class V1CurrentUser(APIView):
         user = request.user
         user.delete()
         return Response({"detail": "User account deleted successfully."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class V1HandleServiceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["service management"],
+        parameters=[
+            OpenApiParameter(
+                name="doc_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The type of document requested. e.g. **testimonial**, **certificate**, **transcript**.",
+                required=True
+            )
+        ],
+        responses={
+            200: None,
+            400: None,
+        },
+        request=None,
+    )
+    def get(self, request):
+        """
+        Request for services with the query parameter `doc_type`\n
+        ## Supported document types are:\n
+        1. **testimonial**\n
+        2. **certificate**\n
+        3. **transcript**\n
+    
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
+
+        doc_type = request.query_params.get('doc_type')
+
+        if doc_type == "testimonial":
+            # Handle the request for testimonial
+            return Response({"message": "Testimonial request received."}, status=status.HTTP_200_OK)
+        elif doc_type == "certificate":
+            # Handle the request for certificate
+            return Response({"message": "Certificate request received."}, status=status.HTTP_200_OK)
+        elif doc_type == "transcript":
+            # Handle the request for transcript
+            return Response({"message": "Transcript request received."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid document request received!"}, status=status.HTTP_400_BAD_REQUEST)
