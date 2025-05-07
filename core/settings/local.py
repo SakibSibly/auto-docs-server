@@ -55,6 +55,7 @@ SPECTACULAR_SETTINGS = {
     "TAGS": [
         {"name": "user management"},
         {"name": "authenticated user management"},
+        {"name": "service management"},
         {"name": "test"},
         {"name": "schemas"},
     ],
