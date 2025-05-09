@@ -14,6 +14,7 @@ class CustomUserSerializer(serializers.Serializer):
     name_mother = serializers.CharField(max_length=50, required=False, allow_blank=True)
     session = serializers.CharField(max_length=20)
     blood_group = serializers.CharField(max_length=10, required=False, allow_blank=True)
+    user_photo = serializers.CharField(required=False, allow_blank=True)
 
     def create(self, validated_data):
         user = models.CustomUser(
@@ -26,7 +27,8 @@ class CustomUserSerializer(serializers.Serializer):
             name_father=validated_data.get('name_father', ""),
             name_mother=validated_data.get('name_mother', ""),
             session=validated_data.get('session', ""),
-            blood_group=validated_data.get('blood_group', "")
+            blood_group=validated_data.get('blood_group', ""),
+            user_photo=validated_data.get('user_photo', "")
         )
         user.set_password(validated_data.get('password', ""))
         user.save()
@@ -43,6 +45,7 @@ class CustomUserSerializer(serializers.Serializer):
         instance.name_mother = validated_data.get('name_mother', instance.name_mother)
         instance.session = validated_data.get('session', instance.session)
         instance.blood_group = validated_data.get('blood_group', instance.blood_group)
+        instance.user_photo = validated_data.get('user_photo', instance.user_photo)
 
         if 'password' in validated_data:
             instance.set_password(validated_data['password'])
@@ -62,5 +65,6 @@ class CustomUserSerializer(serializers.Serializer):
             'name_father' : instance.name_father,
             'name_mother' : instance.name_mother,
             'session' : instance.session,
-            'blood_group' : instance.blood_group
+            'blood_group' : instance.blood_group,
+            'user_photo' : instance.user_photo
         }
