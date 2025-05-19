@@ -6,6 +6,7 @@ class CustomUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=300)
     student_id = serializers.IntegerField()
+    department = serializers.CharField(max_length=100, required=False, allow_blank=True)
     mobile_number = serializers.CharField(max_length=15, required=False, allow_blank=True)
     date_of_birth = serializers.DateField(required=False, allow_null=True)
     role = serializers.IntegerField()
@@ -20,6 +21,7 @@ class CustomUserSerializer(serializers.Serializer):
         user = models.CustomUser(
             email=validated_data.get('email', ""),
             student_id=validated_data.get('student_id', ""),
+            department=validated_data.get('department', ""),
             mobile_number=validated_data.get('mobile_number', ""),
             date_of_birth=validated_data.get('date_of_birth', None),
             role_id=validated_data.get('role', ""),
@@ -37,6 +39,7 @@ class CustomUserSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
         instance.student_id = validated_data.get('student_id', instance.student_id)
+        instance.department = validated_data.get('department', instance.department)
         instance.mobile_number = validated_data.get('mobile_number', instance.mobile_number)
         instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
         instance.role_id = validated_data.get('role', instance.role_id)
@@ -58,6 +61,7 @@ class CustomUserSerializer(serializers.Serializer):
         return {
             'email' : instance.email,
             'student_id' : instance.student_id,
+            'department' : instance.department,
             'mobile_number' : instance.mobile_number,
             'date_of_birth' : instance.date_of_birth,
             'role' : instance.role_id,

@@ -14,6 +14,36 @@ class Document(models.Model):
     description = models.TextField(null=True, blank=True)
 
 
+class Faculty(models.Model):
+    name = models.CharField(max_length=100)
+    short_name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Department(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    short_name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(null=True, blank=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Course(models.Model):
+    course_code = models.CharField(max_length=100, unique=True)
+    course_title = models.CharField(max_length=200)
+    course_description = models.TextField(null=True, blank=True)
+    dept_name = models.ForeignKey(Department, on_delete=models.CASCADE)
+    course_credit = models.FloatField()
+
+    def __str__(self):
+        return self.course_code + ' - ' + self.course_title
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -36,6 +66,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=300)
     student_id = models.IntegerField(unique=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, blank=True)
@@ -78,36 +109,6 @@ class ServiceRequest(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.request_type} - {self.status}"
-
-
-class Faculty(models.Model):
-    name = models.CharField(max_length=100)
-    short_name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Department(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    short_name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(null=True, blank=True)
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-
-class Course(models.Model):
-    course_code = models.CharField(max_length=100, unique=True)
-    course_title = models.CharField(max_length=200)
-    course_description = models.TextField(null=True, blank=True)
-    dept_name = models.ForeignKey(Department, on_delete=models.CASCADE)
-    course_credit = models.FloatField()
-
-    def __str__(self):
-        return self.course_code + ' - ' + self.course_title
 
 
 class StudentRecord(models.Model):
