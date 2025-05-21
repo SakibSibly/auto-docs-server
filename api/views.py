@@ -34,6 +34,8 @@ class CustomUserCreate(APIView):
         if models.CustomUser.objects.filter(student_id=request.data.get('student_id')):
             return Response({'detail': 'Student ID already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
+        # Custom logic to handle role and department foreign keys
+
         role_id = request.data.get('role')
         role_instance = None
 
@@ -43,11 +45,22 @@ class CustomUserCreate(APIView):
             except models.Role.DoesNotExist:
                 return Response({'detail': 'Invalid role ID'}, status=status.HTTP_400_BAD_REQUEST)
         
+        department_id = request.data.get('department')
+        department_instance = None
+
+        if department_id is not None:
+            try:
+                department_instance = models.Department.objects.get(id=department_id)
+            except models.Department.DoesNotExist:
+                return Response({'detail': 'Invalid department ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
         if serializer.is_valid():
             user = serializer.save()
             if role_instance:
                 user.role = role_instance
-                user.save()
+            if department_instance:
+                user.department = department_instance
+            user.save()
 
             return Response({'user': serializer.data}, status=status.HTTP_201_CREATED)
         
