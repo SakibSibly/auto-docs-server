@@ -9,5 +9,8 @@ db.sqlite3
 # Pycache
 __pycache__
 
-# Template files
+# Template Files
 api/templates/
+
+# Local Testing Files
+LOCAL_TEST
