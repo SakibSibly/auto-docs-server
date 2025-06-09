@@ -56,6 +56,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "user management"},
         {"name": "authenticated user management"},
         {"name": "service management"},
+        {"name": "admin role permissions"},
         {"name": "test"},
         {"name": "schemas"},
     ],
