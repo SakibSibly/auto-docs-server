@@ -9,6 +9,14 @@ class Role(models.Model):
         return self.name
 
 
+class RequestStatus(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Document(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
@@ -106,12 +114,12 @@ class OTP(models.Model):
 class ServiceRequest(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     request_doc = models.ForeignKey(Document, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, default='Pending')
+    status = models.ForeignKey(RequestStatus, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.student} - {self.request_type} - {self.status}"
+        return f"{self.student} - {self.request_doc} - {self.status}"
 
 
 class StudentRecord(models.Model):
