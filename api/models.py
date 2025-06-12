@@ -119,7 +119,7 @@ class ServiceRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.student} - {self.request_type} - {self.status}"
+        return f"{self.student} - {self.request_doc} - {self.status}"
 
 
 class StudentRecord(models.Model):
