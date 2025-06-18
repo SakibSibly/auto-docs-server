@@ -55,6 +55,13 @@ class Course(models.Model):
         return self.course_code + ' - ' + self.course_title
 
 
+class Gender(models.Model):
+    name = models.CharField(max_length=10, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -77,6 +84,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=300)
     student_id = models.IntegerField(unique=True)
+    student_reg = models.IntegerField(null=True, blank=True)
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
@@ -85,6 +94,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     name_father = models.CharField(max_length=50, null=True, blank=True)
     name_mother = models.CharField(max_length=50, null=True, blank=True)
     session = models.CharField(max_length=20)
+    passed_year = models.CharField(max_length=10, null=True, blank=True)
+    cgpa = models.FloatField(null=True, blank=True)
     blood_group = models.CharField(max_length=10, null=True, blank=True)
     user_photo = models.TextField(null=True, blank=True)
 
@@ -126,6 +137,7 @@ class StudentRecord(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     semester = models.CharField(max_length=10)
+    credit = models.FloatField()
     year = models.IntegerField()
     gpa = models.FloatField()
 
