@@ -16,8 +16,9 @@ class CustomUserCreate(APIView):
     1. **email**: The email address of the user.\n
     2. **password**: The password for the user account.\n
     3. **student_id**: The student ID of the user. e.g. 200104\n
-    4. **role**: The role ID of the user. e.g. 1\n
-    5. **session**: The session of the user. e.g. 2020-21\n
+    4. **department**: The department ID of the user. e.g. 1\n
+    5. **role**: The role ID of the user. e.g. 1\n
+    6. **session**: The session of the user. e.g. 2020-21\n
     """
 
     @extend_schema(
