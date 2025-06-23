@@ -249,11 +249,8 @@ class V1UserRequestHandleView(APIView):
         3. **verified**: Show only verified user requests.\n
         4. **rejected**: Show only rejected user requests.\n
         ## Note:\n
-        1. If no query parameters are provided, it will return all user requests.\n
-        2. If `status` is provided, it will filter the requests based on the status.\n
-        3. If `user_id` is provided, it will filter the requests based on the user ID.\n
-        4. If both `status` and `user_id` are provided, it will filter the requests based on both parameters.\n
-        5. The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        1. If no query parameters are provided, it will return all user requests who are alumni and students only.\n
+        2. The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
         """
 
         user_requests = models.CustomUser.objects.none()
