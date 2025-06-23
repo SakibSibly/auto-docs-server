@@ -209,6 +209,13 @@ class V1UserRequestHandleView(APIView):
         tags=["admin role permissions"],
         parameters=[
             OpenApiParameter(
+                name="type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The role of the user. e.g. **alumni**, **student**.",
+                required=False
+            ),
+            OpenApiParameter(
                 name="status",
                 type=str,
                 location=OpenApiParameter.QUERY,
@@ -233,12 +240,13 @@ class V1UserRequestHandleView(APIView):
         """
         See user account status who applied for account creation.\n
         ## Optional query parameters:\n
-        1. **user_id**: Filter requests by user ID.\n
-        2. **status**: Filter requests by status.\n
+        1. **status**: Filter requests by status.\n
+        2. **type**: Filter requests by user type.\n
+        3. **user_id**: Filter requests by user ID.\n
         ## Supported status values are:\n
         1. **all**: Show all user requests.\n
         2. **pending**: Show only pending user requests.\n
-        3. **approved**: Show only approved user requests.\n
+        3. **verified**: Show only verified user requests.\n
         4. **rejected**: Show only rejected user requests.\n
         ## Note:\n
         1. If no query parameters are provided, it will return all user requests.\n
@@ -248,5 +256,39 @@ class V1UserRequestHandleView(APIView):
         5. The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
         """
 
-        # Implement logic to retrieve service requests based on the status and user_id query parameters
-        return Response({"message": "User account request list retrieved."}, status=status.HTTP_200_OK)
+        user_requests = models.CustomUser.objects.none()
+
+        if request.query_params.get('status') == 'all':
+            user_requests = models.CustomUser.objects.all()
+        elif request.query_params.get('status') == 'pending':
+            user_requests = models.CustomUser.objects.filter(is_active=False)
+        elif request.query_params.get('status') == 'verified':
+            user_requests = models.CustomUser.objects.filter(is_active=True)
+        elif request.query_params.get('status') == 'rejected':
+            return Response({"detail": "Needs to implement the feature!"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_requests = models.CustomUser.objects.all()
+        
+
+        if request.query_params.get('type') == 'alumni':
+            user_requests = user_requests.filter(role__name='Alumni')
+        elif request.query_params.get('type') == 'student':
+            user_requests = user_requests.filter(role__name='Student')
+        else:
+            user_requests = user_requests.filter(role__name__in=['Alumni', 'Student'])
+        
+        if request.query_params.get('user_id'):
+            try:
+                user_id = int(request.query_params.get('user_id'))
+                user_requests = user_requests.filter(student_id=user_id)
+            except ValueError:
+                return Response({"detail": "Invalid user ID provided."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not user_requests:
+            return Response({"detail": "No user requests found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = serializers.CustomUserSerializer(user_requests, many=True)
+        if not serializer.data:
+            return Response({"detail": "No user requests found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
