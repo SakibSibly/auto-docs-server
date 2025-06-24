@@ -17,4 +17,5 @@ urlpatterns = [
 
     # API admin
     path('v1/admin/user-requests/', views.V1UserRequestHandleView.as_view(), name='admin-service-list'),
+    path('v1/admin/services-overview/', views.V1ServicesOverviewView.as_view(), name='admin-services-overview'),
 ]

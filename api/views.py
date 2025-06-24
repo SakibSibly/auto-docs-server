@@ -289,3 +289,61 @@ class V1UserRequestHandleView(APIView):
             return Response({"detail": "No user requests found."}, status=status.HTTP_404_NOT_FOUND)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class V1ServicesOverviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["admin role permissions"],
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "total": {"type": "integer", "description": "Total number of service requests."},
+                    "pending": {"type": "integer", "description": "Number of pending service requests."},
+                    "students": {"type": "integer", "description": "Number of student service requests."},
+                    "alumni": {"type": "integer", "description": "Number of alumni service requests."},
+                    "revenue": {"type": "integer", "description": "Estimated revenue from accepted service requests."}
+                }
+            },
+            400: {
+                "type": "object",
+                "properties": {
+                    "detail": {"type": "string", "description": "Error message."}
+                }
+            },
+        },
+        request=None,
+    )
+    def get(self, request):
+        """
+        Get the overview of all services requested by users.\n
+        The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        """
+        services = models.ServiceRequest.objects.all()
+        users = models.CustomUser.objects.all()
+        
+        if not services:
+            return Response({"detail": "No services found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        total = services.count()
+        pending = services.filter(status__name='Pending').count()
+        students = users.filter(role__name='Student').count()
+        alumni = users.filter(role__name='Alumni').count()
+        revenue = services.filter(status__name='Accepted').count() * 100 # Will have to fix later
+
+        overview = {
+            "total": total,
+            "pending": pending,
+            "students": students,
+            "alumni": alumni,
+            "revenue": revenue
+        }
+
+        serializer = serializers.ServiceSerializer(overview)
+
+        if not serializer.data:
+            return Response({"detail": "No services overview found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)

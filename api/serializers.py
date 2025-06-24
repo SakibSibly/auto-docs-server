@@ -88,3 +88,20 @@ class CustomUserSerializer(serializers.Serializer):
             'blood_group' : instance.blood_group,
             'user_photo' : instance.user_photo
         }
+
+
+class ServiceSerializer(serializers.Serializer):
+    total = serializers.IntegerField()
+    pending = serializers.IntegerField()
+    students = serializers.IntegerField()
+    alumni = serializers.IntegerField()
+    revenue = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        return {
+            'total': instance['total'],
+            'pending': instance['pending'],
+            'students': instance['students'],
+            'alumni': instance['alumni'],
+            'revenue': instance['revenue']
+        }
