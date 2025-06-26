@@ -105,3 +105,26 @@ class ServiceSerializer(serializers.Serializer):
             'alumni': instance['alumni'],
             'revenue': instance['revenue']
         }
+
+
+class AccountRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    student_id = serializers.IntegerField()
+    department = serializers.IntegerField()
+    mobile_number = serializers.CharField(max_length=15, required=False, allow_blank=True)
+    full_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    session = serializers.CharField(max_length=20)
+    role = serializers.IntegerField()
+    user_photo = serializers.CharField(required=False, allow_blank=True)
+
+    def to_representation(self, instance):
+        return {
+            'email': instance.email,
+            'student_id': instance.student_id,
+            'department': instance.department_id,
+            'mobile_number': instance.mobile_number,
+            'full_name': instance.full_name,
+            'session': instance.session,
+            'role': instance.role_id,
+            'user_photo': instance.user_photo
+        }

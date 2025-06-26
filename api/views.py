@@ -231,8 +231,28 @@ class V1UserRequestHandleView(APIView):
             )
         ],
         responses={
-            200: None,
-            400: None,
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "email": {"type": "string", "description": "User email."},
+                        "student_id": {"type": "integer", "description": "User student ID."},
+                        "department": {"type": "integer", "description": "User department."},
+                        "mobile_number": {"type": "string", "description": "User mobile number."},
+                        "full_name": {"type": "string", "description": "User full name."},
+                        "session": {"type": "string", "description": "User session."},
+                        "role": {"type": "integer", "description": "User role."},
+                        "user_photo": {"type": "string", "description": "User photo url."}
+                    }
+                }
+            },
+            400: {
+                "type": "object",
+                "properties": {
+                    "detail": {"type": "string", "description": "Error message."}
+                }
+            },
         },
         request=None,
     )
@@ -284,11 +304,13 @@ class V1UserRequestHandleView(APIView):
         if not user_requests:
             return Response({"detail": "No user requests found."}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = serializers.CustomUserSerializer(user_requests, many=True)
-        if not serializer.data:
+        serializer1 = serializers.CustomUserSerializer(user_requests, many=True)
+        if not serializer1.data:
             return Response({"detail": "No user requests found."}, status=status.HTTP_404_NOT_FOUND)
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer2 = serializers.AccountRequestSerializer(user_requests, many=True)
+
+        return Response(serializer2.data, status=status.HTTP_200_OK)
 
 
 class V1ServicesOverviewView(APIView):
