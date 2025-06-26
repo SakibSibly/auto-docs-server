@@ -128,3 +128,42 @@ class AccountRequestSerializer(serializers.Serializer):
             'role': instance.role_id,
             'user_photo': instance.user_photo
         }
+
+
+class DepartmentSerializer(serializers.Serializer):
+    code = serializers.IntegerField()
+    name = serializers.CharField(max_length=100)
+    short_name = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    faculty = serializers.IntegerField()
+
+    def create(self, validated_data):
+        department = models.Department(
+            code=validated_data.get('code', ""),
+            name=validated_data.get('name', ""),
+            short_name=validated_data.get('short_name', ""),
+            description=validated_data.get('description', ""),
+            faculty_id=validated_data.get('faculty', "")
+        )
+        department.save()
+        return department
+    
+    
+    def update(self, instance, validated_data):
+        instance.code = validated_data.get('code', instance.code)
+        instance.name = validated_data.get('name', instance.name)
+        instance.short_name = validated_data.get('short_name', instance.short_name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.faculty_id = validated_data.get('faculty', instance.faculty_id)
+        instance.save()
+        return instance
+        
+
+    def to_representation(self, instance):
+        return {
+            'code': instance.code,
+            'name': instance.name,
+            'short_name': instance.short_name,
+            'description': instance.description,
+            'faculty': instance.faculty_id
+        }

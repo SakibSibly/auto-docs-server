@@ -369,3 +369,151 @@ class V1ServicesOverviewView(APIView):
             return Response({"detail": "No services overview found."}, status=status.HTTP_404_NOT_FOUND)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class V1DepartmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["admin role permissions"],
+        parameters=[
+            OpenApiParameter(
+                name="code",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="The code of the department. e.g. **1**, **2**.",
+                required=False
+            ),
+        ],
+        responses={
+            200: serializers.DepartmentSerializer(many=True),
+            400: {
+                "type": "object",
+                "properties": {
+                    "detail": {"type": "string", "description": "Error message."}
+                }
+            },
+        },
+        request=None,
+    )
+    def get(self, request):
+        """
+        Get the list of all departments.\n
+
+        ## Optional query parameter:\n
+        1. **code**: Filter departments by code.\n
+        ## Note:\n
+        1. If no query parameter is provided, it will return all departments.\n
+        2. The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        """
+        departments = models.Department.objects.all()
+
+        dept_code = request.query_params.get('code')
+
+        if dept_code:
+            try:
+                department = departments.get(code=dept_code)
+                
+                if not department:
+                    return Response({"detail": "Department not found."}, status=status.HTTP_404_NOT_FOUND)
+                
+                serializer = serializers.DepartmentSerializer(department)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            except models.Department.DoesNotExist:
+                return Response({"detail": "Department not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not departments:
+            return Response({"detail": "No departments found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = serializers.DepartmentSerializer(departments, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+    @extend_schema(
+        request=serializers.DepartmentSerializer,
+        responses={201: serializers.DepartmentSerializer, 400: None},
+        tags=["admin role permissions"]
+    )
+    def post(self, request):
+        """
+        Create a new department.\n
+        The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        """
+        serializer = serializers.DepartmentSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            try:
+                department = serializer.save()
+                department.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @extend_schema(
+        request=serializers.DepartmentSerializer,
+        responses={201: serializers.DepartmentSerializer, 400: None},
+        tags=["admin role permissions"]
+    )
+    def put(self, request):
+        """
+        Update the department information.\n
+        The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        """
+        dept = models.Department.objects.filter(code=request.data.get('code')).first()
+        if not dept:
+            return Response({"detail": "Department not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = serializers.DepartmentSerializer(dept, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    @extend_schema(
+        request=serializers.DepartmentSerializer,
+        parameters=[
+            OpenApiParameter(
+                name="code",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="The code of the department. e.g. **1**, **2**.",
+                required=False
+            ),
+        ],
+        responses={200: {
+            "type": "object",
+            "properties": {
+                "detail": {"type": "string", "description": "Success message."}
+            }
+        }, 400: {
+            "type": "object",
+            "properties": {
+                "detail": {"type": "string", "description": "Error message."}
+            }
+        }},
+        tags=["admin role permissions"]
+    )
+    def delete(self, request):
+        """
+        Delete a department.\n
+        The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
+        """
+
+        dept = models.Department.objects.filter(code=request.query_params.get('code')).first()
+        
+        if not dept:
+            return Response({"detail": "Department not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            dept.delete()
+            return Response({"detail": "Department deleted successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
