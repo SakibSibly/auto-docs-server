@@ -517,3 +517,51 @@ class V1DepartmentView(APIView):
             return Response({"detail": "Department deleted successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class V1UserDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["authenticated user management"],
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "email": {"type": "string", "description": "User email."},
+                    "student_id": {"type": "integer", "description": "User student ID."},
+                    "student_reg": {"type": "integer", "description": "User student registration number."},
+                    "gender": {"type": "integer", "description": "User gender"},
+                    "department": {"type": "integer", "description": "User department."},
+                    "mobile_number": {"type": "string", "description": "User mobile number."},
+                    "date_of_birth": {"type": "string", "format": "date", "description": "User date of birth."},
+                    "role": {"type": "integer", "description": "User role."},
+                    "full_name": {"type": "string", "description": "User full name."},
+                    "name_father": {"type": "string", "description": "User father's name."},
+                    "name_mother": {"type": "string", "description": "User mother's name."},
+                    "session": {"type": "string", "description": "User session."},
+                    "passed_year": {"type": "string", "description": "User passed year."},
+                    "cgpa": {"type": "number", "format": "float", "description": "User CGPA."},
+                    "blood_group": {"type": "string", "description": "User blood group."},
+                    "user_photo": {"type": "string", "description": "User photo URL."}
+                }
+            },
+            404: {
+                "type": "object",
+                "properties": {
+                    "detail": {"type": "string", "description": "Error message."}
+                }
+            }},
+        request=None,
+    )
+    def get(self, request, pk):
+        """
+        Get the details of a user by their ID.\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
+        try:
+            user = models.CustomUser.objects.get(student_id=pk)
+            serializer = serializers.CustomUserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except models.CustomUser.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
