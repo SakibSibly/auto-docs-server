@@ -554,13 +554,13 @@ class V1UserDetail(APIView):
             }},
         request=None,
     )
-    def get(self, request, pk):
+    def get(self, request, student_id):
         """
         Get the details of a user by their ID.\n
         The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
         """
         try:
-            user = models.CustomUser.objects.get(student_id=pk)
+            user = models.CustomUser.objects.get(student_id=student_id)
             serializer = serializers.CustomUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except models.CustomUser.DoesNotExist:
