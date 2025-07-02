@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils import timezone
+import uuid
 
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -116,11 +118,29 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class OTP(models.Model):
     email = models.EmailField()
-    otp = models.CharField(max_length=6)
+    otp_code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+    session_id = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
-        return self.email + ' - ' + self.otp
+        return self.email + ' - ' + self.otp_code
+    
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
+
+
+class EmailLink(models.Model):
+    email = models.EmailField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+    session_id = models.UUIDField(default=uuid.uuid4)
+
+    def __str__(self):
+        return self.email + ' - ' + str(self.session_id)
+    
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
 
 
 class ServiceRequest(models.Model):
