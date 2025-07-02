@@ -167,3 +167,13 @@ class DepartmentSerializer(serializers.Serializer):
             'description': instance.description,
             'faculty': instance.faculty_id
         }
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    
+    def to_representation(self, instance):
+        return {
+            "email": instance.email
+        }
