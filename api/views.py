@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,6 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from . import serializers
 from . import models
+from .utils.email_management import send_otp_email, send_link_email
 
 class CustomUserCreate(APIView):
     """
@@ -107,6 +109,132 @@ class V1ApiGreet(APIView):
         Simple `Hello World` message from the **/api/v1/info/** endpoint.
         """
         return Response({"message": "Hello, World from API version 1!"}, status=status.HTTP_200_OK)
+
+
+class SendEmail(APIView):
+
+    @extend_schema(
+        tags=["user management"],
+        parameters=[
+            OpenApiParameter(
+                name="method",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The method of verification to be used. e.g. **otp**, **link**.",
+                required=True
+            )
+        ],
+        request=serializers.EmailSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "message": {"type": "string", "description": "Email sent successfully"},
+                }
+                },
+            400: {
+                "type": "object",
+                "properties": {
+                    "details": {
+                        "type": "string",
+                        "details": "Error message"
+                    }
+                },
+            }
+        }
+    )
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"error": "Email is required"}, status=400)
+        
+        if request.query_params.get('method') == 'link':
+            send_link_email(email)
+            return Response({"message": "Verification link sent"}, status=status.HTTP_200_OK)
+            
+        elif request.query_params.get('method') == 'otp':
+            send_otp_email(email)
+            return Response({"message": "OTP sent"}, status=status.HTTP_200_OK)
+
+
+class VerifyEmail(APIView):
+
+    @extend_schema(
+        tags=["user management"],
+        parameters=[
+            OpenApiParameter(
+                name="method",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The method of verification to be used. e.g. **otp**, **link**.",
+                required=True
+            ),
+            OpenApiParameter(
+                name="email",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The email of the user.",
+                required=True
+            ),
+            OpenApiParameter(
+                name="unique_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The unique session ID for the OTP.",
+                required=True
+            ),
+        ],
+        responses={
+            200: None,
+            400: None
+        }
+    )
+    def get(self, request):
+        email = request.query_params.get('email')
+
+        if not email:
+            return Response({"details": "Email is required"}, status=400)
+
+        if request.query_params.get('method') == 'link':
+            unique_id = request.query_params.get('unique_id')
+            if not unique_id:
+                return Response({"details": "Unique ID is required"}, status=400)
+
+            try:
+                link_obj = models.EmailLink.objects.get(session_id=unique_id, email=email)
+            except models.EmailLink.DoesNotExist:
+                return Response({"details": "Invalid or expired link"}, status=400)
+
+            if link_obj.is_expired():
+                link_obj.is_verified = True
+                link_obj.save()
+                return Response({"details": "Link expired"}, status=400)
+            
+            # Mark the link as verified
+            link_obj.is_verified = True
+            link_obj.save()
+            return Response({"message": "Email verified successfully"})
+        
+        elif request.query_params.get('method') == 'otp':
+            otp = request.query_params.get('unique_id')
+            if not otp:
+                return Response({"details": "OTP is required"}, status=400)
+
+            try:
+                otp_obj = models.OTP.objects.filter(email=email, otp_code=otp, is_verified=False).latest('created_at')
+            except models.OTP.DoesNotExist:
+                return Response({"details": "Invalid OTP"}, status=400)
+
+            if otp_obj.is_expired():
+                otp_obj.is_verified = True
+                otp_obj.save()
+                return Response({"details": "OTP expired"}, status=400)
+
+            # Mark the OTP as verified
+            otp_obj.is_verified = True
+            otp_obj.save()
+
+            return Response({"message": "OTP verified successfully"})
 
 
 class V1CurrentUser(APIView):
