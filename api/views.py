@@ -651,7 +651,7 @@ class V1UserDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        tags=["authenticated user management"],
+        tags=["admin role permissions"],
         responses={
             200: {
                 "type": "object",

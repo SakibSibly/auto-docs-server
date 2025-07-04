@@ -53,10 +53,10 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     "TITLE": "Auto Docs Project",
     "TAGS": [
-        {"name": "user management"},
-        {"name": "authenticated user management"},
-        {"name": "service management"},
         {"name": "admin role permissions"},
+        {"name": "authenticated user management"},
+        {"name": "user management"},
+        {"name": "service management"},
         {"name": "test"},
         {"name": "schemas"},
     ],
