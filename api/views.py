@@ -534,7 +534,7 @@ class V1DepartmentView(APIView):
         1. If no query parameter is provided, it will return all departments.\n
         2. The user must be `authenticated` with valid **JWT token** with admin account to access this endpoint.\n
         """
-        departments = models.Department.objects.all()
+        departments = models.Department.objects.order_by('code')
 
         dept_code = request.query_params.get('code')
 
