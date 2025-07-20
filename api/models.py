@@ -103,6 +103,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     user_photo = models.TextField(null=True, blank=True)
 
     is_active = models.BooleanField(default=False)
+    is_eligible = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
