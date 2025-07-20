@@ -659,6 +659,15 @@ class V1UserDetail(APIView):
 
     @extend_schema(
         tags=["admin role permissions"],
+        parameters=[
+            OpenApiParameter(
+                name="is_eligible",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The eligibility status of user request. e.g. **True**, **False**.",
+                required=False
+            )
+        ],
         responses={
             200: {
                 "type": "object",
@@ -694,6 +703,20 @@ class V1UserDetail(APIView):
         Get the details of a user by their ID.\n
         The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
         """
+        eligibility_status = request.query_params.get('is_eligible')
+
+        if eligibility_status is not None:
+            if eligibility_status == "False":
+                with transaction.atomic():
+                    models.CustomUser.objects.filter(student_id=student_id).update(is_rejected=True)
+                return Response({'details': 'User account rejected!'})
+            elif eligibility_status == "True":
+                with transaction.atomic():
+                    models.CustomUser.objects.filter(student_id=student_id).update(is_eligible=True)
+                return Response({'details': 'User account approved'})
+
+
+
         try:
             user = models.CustomUser.objects.get(student_id=student_id)
             serializer = serializers.CustomUserSerializer(user)
