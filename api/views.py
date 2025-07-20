@@ -1,4 +1,6 @@
 from django.utils import timezone
+from django.shortcuts import render
+from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -208,12 +210,17 @@ class VerifyEmail(APIView):
             if link_obj.is_expired():
                 link_obj.is_verified = True
                 link_obj.save()
-                return Response({"details": "Link expired"}, status=400)
+                return render(request, 'pages/verification_expired.html', status=status.HTTP_400_BAD_REQUEST)
             
             # Mark the link as verified
             link_obj.is_verified = True
             link_obj.save()
-            return Response({"message": "Email verified successfully"})
+            
+            # Activate the account
+            with transaction.atomic():
+                models.CustomUser.objects.filter(email=email).update(is_active=True)
+
+            return render(request, 'pages/email_verification.html', context={'user': request.user})
         
         elif request.query_params.get('method') == 'otp':
             otp = request.query_params.get('unique_id')
