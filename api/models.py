@@ -25,10 +25,20 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
+    
+class University(models.Model):
+    name = models.CharField(max_length=100)
+    short_form = models.CharField(max_length=20)
+    code = models.IntegerField(unique=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Faculty(models.Model):
     name = models.CharField(max_length=100)
+    university = models.ForeignKey(University, on_delete=models.CASCADE)
     short_name = models.CharField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
 

@@ -10,6 +10,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from . import serializers
 from . import models
 from .utils.email_management import send_otp_email, send_link_email
+from .utils.generate_serial import get_serial
 
 class CustomUserCreate(APIView):
     """
@@ -723,3 +724,57 @@ class V1UserDetail(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except models.CustomUser.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class SerialNumberGenarator(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["authenticated user management"],
+        parameters=[
+            OpenApiParameter(
+                name="doc_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="The documnet type. e.g. **certificate**, **testimonial**",
+                required=True
+            )
+        ],
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "student_id": {"type": "integer", "description": "The studnet id of the user"},
+                    "serial": {"type": "string", "description": "The generated serial number"}
+                }
+            },
+            404: {
+                "type": "object",
+                "properties": {
+                    "detail": {"type": "string", "description": "Error message."}
+                }
+            }},
+        request=None,
+    )
+    def get(self, request):
+        """
+        Get the serial number for a requested document.\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+
+        **Supported parameters type are:**
+        1. **certificate**
+        2. **testimonial**
+        3. **appreared**
+        """
+        
+        if not request.user.is_eligible:
+            return Response({"detail": "You're not eligible to make this request"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        doc_type = request.query_params.get('doc_type')
+        if doc_type == None:
+            return Response({"detail": "document type is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            "student_id": request.user.student_id,
+            "serial": get_serial(request.user, doc_type)
+        }, status=status.HTTP_200_OK)
