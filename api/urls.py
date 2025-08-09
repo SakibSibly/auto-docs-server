@@ -16,7 +16,7 @@ urlpatterns = [
     path('v1/users/me/', views.V1CurrentUser.as_view(), name='current-user'),
     path('v1/info/', views.V1ApiGreet.as_view(), name='hello-world-message'),
     path('v1/services/', views.V1HandleServiceView.as_view(), name='service-list'),
-    path('v1/users/reqeust/serial-number/', views.SerialNumberGenarator.as_view(), name='get-serial-number'),
+    path('v1/users/request/serial-number/', views.SerialNumberGenarator.as_view(), name='get-serial-number'),
 
     # API admin
     path('v1/admin/users/<int:student_id>/', views.V1UserDetail.as_view(), name='user-detail'),
