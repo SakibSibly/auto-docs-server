@@ -24,7 +24,8 @@ def get_serial(user: CustomUser, doc_type: str) -> str:
     MONTH = f"{now.month:02d}"
     DATE = f"{now.day:02d}"
     HOUR = f"{now.hour:02d}"
+    MINUTE = f"{now.minute}"
     SECOND = f"{now.second:02d}"
 
-    return DOC_TYPE + UNI_CODE + DEPT_CODE + STD_ID + SESSION + YEAR + MONTH + DATE + HOUR + SECOND
+    return DOC_TYPE + UNI_CODE + DEPT_CODE + STD_ID + SESSION + YEAR + MONTH + DATE + HOUR + MINUTE + SECOND
     
