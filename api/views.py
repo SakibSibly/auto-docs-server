@@ -325,19 +325,71 @@ class V1HandleServiceView(APIView):
         """
 
         doc_type = request.query_params.get('doc_type')
+        stat = models.RequestStatus.objects.filter(name="Accepted").first()
 
         if doc_type == "testimonial":
-            # Handle the request for testimonial
-            return Response({"message": "Testimonial request received."}, status=status.HTTP_200_OK)
+            request_doc = models.Document.objects.filter(name="Testimonial").first()
+            if not request_doc:
+                return Response({"detail": "Testimonial document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            return Response(
+                {
+                "message": "Testimonial request received.",
+                "trace_id": obj.id
+                },
+                status=status.HTTP_200_OK
+                )
         elif doc_type == "certificate":
-            # Handle the request for certificate
-            return Response({"message": "Certificate request received."}, status=status.HTTP_200_OK)
+            request_doc = models.Document.objects.filter(name="Certificate").first()
+            if not request_doc:
+                return Response({"detail": "Certificate document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            return Response(
+                {
+                "message": "Certificate request received.",
+                "trace_id": obj.id
+                },
+                status=status.HTTP_200_OK
+                )
         elif doc_type == "transcript":
-            # Handle the request for transcript
-            return Response({"message": "Transcript request received."}, status=status.HTTP_200_OK)
+            request_doc = models.Document.objects.filter(name="Transcript").first()
+            if not request_doc:
+                return Response({"detail": "Transcript document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            return Response(
+                {
+                "message": "Transcript request received.",
+                "trace_id": obj.id
+                },
+                status=status.HTTP_200_OK
+                )
         else:
             return Response({"detail": "Invalid document request received!"}, status=status.HTTP_400_BAD_REQUEST)
         
+
+class V1HandleServiceDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["service management"],
+        responses={
+            200: None,
+            404: None,
+        },
+    )
+    def get(self, request, service_id):
+        """
+        Get the details of a specific service request by its ID.\n
+        The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
+        """
+        try:
+            service_request = models.ServiceRequest.objects.get(id=service_id)
+            serializer = serializers.ServiceRequestSerializer(service_request)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except models.ServiceRequest.DoesNotExist:
+            return Response({"detail": "Service request not found."}, status=status.HTTP_404_NOT_FOUND)        
+
+
 class V1UserRequestHandleView(APIView):
     permission_classes = [IsAuthenticated]
 

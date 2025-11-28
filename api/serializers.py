@@ -177,3 +177,26 @@ class EmailSerializer(serializers.Serializer):
         return {
             "email": instance.email
         }
+
+
+class ServiceRequestSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    student = serializers.IntegerField(source='student.id')
+    request_doc = serializers.IntegerField(source='request_doc.id')
+    status = serializers.IntegerField(source='status.id')
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'student': instance.student.id,
+            'student_name': instance.student.full_name if instance.student.full_name else None,
+            'student_email': instance.student.email,
+            'request_doc': instance.request_doc.id,
+            'request_doc_name': instance.request_doc.name,
+            'status': instance.status.id,
+            'status_name': instance.status.name,
+            'created_at': instance.created_at,
+            'updated_at': instance.updated_at
+        }
