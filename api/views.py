@@ -305,13 +305,19 @@ class V1HandleServiceView(APIView):
                 location=OpenApiParameter.QUERY,
                 description="The type of document requested. e.g. **testimonial**, **certificate**, **transcript**.",
                 required=True
+            ),
+            OpenApiParameter(
+                name="serial_number",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="The serial number of the document requested. e.g. **12345678**.",
+                required=True
             )
         ],
         responses={
             200: None,
             400: None,
         },
-        request=None,
     )
     def get(self, request):
         """
@@ -331,11 +337,10 @@ class V1HandleServiceView(APIView):
             request_doc = models.Document.objects.filter(name="Testimonial").first()
             if not request_doc:
                 return Response({"detail": "Testimonial document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
-            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat, unique_serial=request.query_params.get('serial_number'))
             return Response(
                 {
-                "message": "Testimonial request received.",
-                "trace_id": obj.id
+                "message": "Testimonial request received."
                 },
                 status=status.HTTP_200_OK
                 )
@@ -343,11 +348,10 @@ class V1HandleServiceView(APIView):
             request_doc = models.Document.objects.filter(name="Certificate").first()
             if not request_doc:
                 return Response({"detail": "Certificate document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
-            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat, unique_serial=request.query_params.get('serial_number'))
             return Response(
                 {
-                "message": "Certificate request received.",
-                "trace_id": obj.id
+                "message": "Certificate request received."
                 },
                 status=status.HTTP_200_OK
                 )
@@ -355,11 +359,10 @@ class V1HandleServiceView(APIView):
             request_doc = models.Document.objects.filter(name="Transcript").first()
             if not request_doc:
                 return Response({"detail": "Transcript document type not found in database."}, status=status.HTTP_404_NOT_FOUND)
-            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat)
+            obj = models.ServiceRequest.objects.create(student=request.user, request_doc=request_doc, status=stat, unique_serial=request.query_params.get('serial_number'))
             return Response(
                 {
-                "message": "Transcript request received.",
-                "trace_id": obj.id
+                "message": "Transcript request received."
                 },
                 status=status.HTTP_200_OK
                 )
@@ -368,7 +371,6 @@ class V1HandleServiceView(APIView):
         
 
 class V1HandleServiceDetailView(APIView):
-    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["service management"],
@@ -383,7 +385,7 @@ class V1HandleServiceDetailView(APIView):
         The user must be `authenticated` with valid **JWT token** to access this endpoint.\n
         """
         try:
-            service_request = models.ServiceRequest.objects.get(id=service_id)
+            service_request = models.ServiceRequest.objects.get(unique_serial=service_id)
             serializer = serializers.ServiceRequestSerializer(service_request)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except models.ServiceRequest.DoesNotExist:

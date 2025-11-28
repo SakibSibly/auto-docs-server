@@ -182,6 +182,7 @@ class EmailSerializer(serializers.Serializer):
 class ServiceRequestSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     student = serializers.IntegerField(source='student.id')
+    unique_serial = serializers.IntegerField()
     request_doc = serializers.IntegerField(source='request_doc.id')
     status = serializers.IntegerField(source='status.id')
     created_at = serializers.DateTimeField(read_only=True)

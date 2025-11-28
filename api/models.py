@@ -157,6 +157,7 @@ class EmailLink(models.Model):
 
 class ServiceRequest(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    unique_serial = models.IntegerField()
     request_doc = models.ForeignKey(Document, on_delete=models.CASCADE)
     status = models.ForeignKey(RequestStatus, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
