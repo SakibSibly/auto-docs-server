@@ -14,4 +14,5 @@ urlpatterns = [
     path('v1/users/me/', views.V1CurrentUser.as_view(), name='current-user'),
     path('v1/info/', views.V1ApiGreet.as_view(), name='hello-world-message'),
     path('v1/services/', views.V1HandleServiceView.as_view(), name='service-list'),
+    path('v1/services/testimonial/<int:pk>/', views.V1HandleServiceDetailView.as_view(), name='service-detail'),
 ]
